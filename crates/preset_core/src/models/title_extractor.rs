@@ -243,7 +243,7 @@ mod tests {
             fallback_value: None,
         };
         let episode = ep("Promo");
-        assert_eq!(ext.extract(&episode).as_deref(), Some("Promo - $5 cost"),);
+        assert_eq!(ext.extract(&episode).as_deref(), Some("Promo - $5 cost"));
     }
 
     #[test]
@@ -256,7 +256,7 @@ mod tests {
             fallback_value: None,
         };
         let episode = ep("ok");
-        assert_eq!(ext.extract(&episode).as_deref(), Some("ok ${abc} ${"),);
+        assert_eq!(ext.extract(&episode).as_deref(), Some("ok ${abc} ${"));
     }
 
     #[test]
