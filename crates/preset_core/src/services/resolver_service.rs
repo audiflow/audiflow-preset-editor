@@ -5,8 +5,8 @@ use fancy_regex::Regex;
 use std::collections::BTreeMap;
 
 use crate::models::{
-    EpisodeData, EpisodeFilterEntry, GroupDef, Grouping, PresetConfig, Playlist,
-    PlaylistDefinition, PlaylistGroup, PlaylistPreviewResult, Presentation, PreviewGrouping,
+    EpisodeData, EpisodeFilterEntry, GroupDef, Grouping, Playlist, PlaylistDefinition,
+    PlaylistGroup, PlaylistPreviewResult, Presentation, PresetConfig, PreviewGrouping,
     SimpleEpisodeData, TitleExtractor, YearBinding,
 };
 
@@ -914,8 +914,8 @@ impl ResolverService {
             }
         }
 
-        filtered.sort_by(|a, b| a.priority.cmp(&b.priority));
-        fallbacks.sort_by(|a, b| a.priority.cmp(&b.priority));
+        filtered.sort_by_key(|a| a.priority);
+        fallbacks.sort_by_key(|a| a.priority);
 
         filtered.extend(fallbacks);
         filtered

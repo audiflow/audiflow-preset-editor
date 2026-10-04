@@ -69,7 +69,7 @@ impl Resolver for YearResolver {
             .collect();
 
         // Sort by year descending (newest first)
-        playlists.sort_by(|a, b| b.sort_key.cmp(&a.sort_key));
+        playlists.sort_by_key(|a| std::cmp::Reverse(a.sort_key));
 
         Some(Grouping {
             playlists,

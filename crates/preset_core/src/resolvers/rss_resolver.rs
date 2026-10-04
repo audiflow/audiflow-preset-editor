@@ -66,7 +66,7 @@ impl Resolver for RssResolver {
             })
             .collect();
 
-        playlists.sort_by(|a, b| a.sort_key.cmp(&b.sort_key));
+        playlists.sort_by_key(|a| a.sort_key);
 
         Some(Grouping {
             playlists,
