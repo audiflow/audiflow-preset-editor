@@ -44,7 +44,7 @@ You can override these on the command line (`make dev DATA_DIR=...`) or set them
 
 | Variable | Default | Used by | Description |
 |----------|---------|---------|-------------|
-| `DATA_DIR` | `../audiflow-preset` | `dev`, `dev-server`, `validate`, `format`, `format-check` | Path to the cloned data repo. It must contain `presets/meta.json` (or the legacy `patterns/meta.json`). |
+| `DATA_DIR` | `../audiflow-preset` | `dev`, `dev-server`, `validate`, `format`, `format-check` | Path to the cloned data repo. It must contain `presets/meta.json`. |
 | `SERVER_PORT` | `8080` | `dev`, `dev-server` | Port the API server listens on. It also sets the default `VITE_API_BASE_URL`. |
 
 ### React app (Vite)
@@ -60,7 +60,7 @@ VITE_API_BASE_URL=http://localhost:9000 make build
 ./target/release/audiflow-editor serve --data-dir ../audiflow-preset --port 9000
 ```
 
-You can also put the value in `packages/preset_react/.env.local`, which Vite reads automatically.
+When you use `make dev` or `make build`, set `VITE_API_BASE_URL` in the shell or on the `make` command line. The Makefile exports a default value, and Vite does not let `.env` files override variables that are already set, so `packages/preset_react/.env.local` has no effect under `make`. It only takes effect when you run `pnpm dev` or `pnpm build` directly.
 
 Example: run the API server on port 9000 against a custom data repo:
 
@@ -152,7 +152,7 @@ presets/
       {playlistId}.json            # Playlist definition
 ```
 
-Data repos that still use the legacy v6 layout (`patterns/` instead of `presets/`) are still supported.
+The `validate`, `format`, and `bump-versions` CLI commands also accept the legacy v6 layout (`patterns/` instead of `presets/`). The web editor requires `presets/`.
 
 The canonical JSON Schema files live in `crates/preset_core/assets/`. See [docs/schema-reference.md](docs/schema-reference.md) for the field reference.
 

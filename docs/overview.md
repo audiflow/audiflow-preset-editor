@@ -32,7 +32,7 @@ operations (commit, push, PR) themselves.
 - **Deterministic pattern ID**: A 12-character hex string derived from podcast identity (podcastGuid or first non-empty trimmed feedUrl) via MD5. New patterns use deterministic IDs; legacy IDs are grandfathered.
 - **Playlist definition**: A JSON config describing how episodes are grouped, filtered, sorted, and displayed.
 - **Resolver**: A strategy that groups episodes into playlists. Types: `seasonNumber`, `titleClassifier`, `year`, `titleDiscovery`.
-- **Split config**: The three-level file hierarchy (`patterns/meta.json` -> `{id}/meta.json` -> `{id}/playlists/{pid}.json`).
+- **Split config**: The three-level file hierarchy (`presets/meta.json` -> `{id}/meta.json` -> `{id}/playlists/{pid}.json`). The legacy v6 layout uses `patterns/`, which only the CLI commands accept.
 - **Schema**: Three JSON Schema files in `crates/preset_core/assets/` that validate each level of the split config.
 - **Claiming**: Higher-priority playlist definitions claim episodes during preview, preventing duplicates in lower-priority definitions.
 - **Data repo**: A git repository containing JSON config files (`audiflow-preset` for all environments).

@@ -34,7 +34,7 @@ This document covers:
 The editor expects and produces this directory layout in the data directory:
 
 ```
-patterns/
+presets/
   meta.json                         # Root index: dataVersion, schemaVersion, pattern summaries
   {presetId}/
     meta.json                       # Pattern metadata: id, feedUrls, podcastGuid, yearGroupedEpisodes, playlists[]
