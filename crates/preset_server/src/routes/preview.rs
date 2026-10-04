@@ -6,8 +6,8 @@ use serde_json::Value;
 
 use crate::app::{AppError, SharedState};
 use preset_core::models::{
-    EpisodeData, GroupDef, NumberingExtractor, PresetConfig, Playlist, PlaylistGroup,
-    PlaylistPreviewResult, PreviewGrouping, SimpleEpisodeData,
+    EpisodeData, GroupDef, NumberingExtractor, Playlist, PlaylistGroup, PlaylistPreviewResult,
+    PresetConfig, PreviewGrouping, SimpleEpisodeData,
 };
 use preset_core::resolvers::{
     CategoryResolver, Resolver, RssResolver, TitleAppearanceResolver, YearResolver,

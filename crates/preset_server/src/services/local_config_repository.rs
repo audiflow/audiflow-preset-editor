@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use serde_json::Value;
-use preset_core::models::{PresetConfig, PresetMeta, PresetSummary, PlaylistDefinition, RootMeta};
+use preset_core::models::{PlaylistDefinition, PresetConfig, PresetMeta, PresetSummary, RootMeta};
 use preset_core::services::ConfigAssembler;
+use serde_json::Value;
 
 /// Repository that reads and writes split config files from the local
 /// filesystem. Files are stored under `$data_dir/presets/`.
@@ -131,10 +131,7 @@ impl LocalConfigRepository {
 
     /// Returns true if a preset directory already exists on disk.
     pub fn preset_exists(&self, preset_id: &str) -> bool {
-        self.presets_dir
-            .join(preset_id)
-            .join("meta.json")
-            .exists()
+        self.presets_dir.join(preset_id).join("meta.json").exists()
     }
 
     /// Creates a new preset directory with playlists/ subdir and

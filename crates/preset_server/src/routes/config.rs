@@ -4,7 +4,7 @@ use serde_json::Value;
 
 use crate::app::{AppError, SharedState};
 use crate::services::local_config_repository::Error as RepoError;
-use preset_core::models::{PresetMeta, PlaylistDefinition};
+use preset_core::models::{PlaylistDefinition, PresetMeta};
 use preset_core::schema::SchemaType;
 use preset_core::services::{check_uniqueness, derive_preset_id};
 

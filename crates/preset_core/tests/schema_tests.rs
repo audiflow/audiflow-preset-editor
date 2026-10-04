@@ -1,5 +1,5 @@
-use serde_json::json;
 use preset_core::schema::{SchemaType, Validator};
+use serde_json::json;
 
 fn test_validator() -> Validator {
     let schema_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("assets");
