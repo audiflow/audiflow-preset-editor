@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use chrono::{TimeZone, Utc};
 
 use preset_core::models::{
-    EpisodeFilterEntry, EpisodeFilters, GroupListingConfig, GroupingConfig, PresetConfig,
-    PresetMeta, PlaylistDefinition, PlaylistGroup, Presentation, SimpleEpisodeData, SortField,
-    SortOrder, SortRule, YearBinding,
+    EpisodeFilterEntry, EpisodeFilters, GroupListingConfig, GroupingConfig, PlaylistDefinition,
+    PlaylistGroup, Presentation, PresetConfig, PresetMeta, SimpleEpisodeData, SortField, SortOrder,
+    SortRule, YearBinding,
 };
 use preset_core::resolvers::{RssResolver, YearResolver};
 use preset_core::services::{
@@ -34,7 +34,7 @@ fn make_episode_with_title(id: i64, title: &str, day: u32, month: u32) -> Simple
 
 #[test]
 fn episode_sorter_sorts_by_published_at_ascending() {
-    let eps = vec![
+    let eps = [
         SimpleEpisodeData {
             id: 1,
             title: "A".into(),
@@ -75,7 +75,7 @@ fn episode_sorter_sorts_by_published_at_ascending() {
 
 #[test]
 fn episode_sorter_null_dates_sort_after_dated_episodes() {
-    let eps = vec![
+    let eps = [
         SimpleEpisodeData {
             id: 1,
             title: "A".into(),
@@ -391,7 +391,7 @@ fn resolver_returns_none_when_no_resolver_succeeds() {
     let service = make_resolver_service(vec![]);
 
     // Episodes with no season and no date -- neither resolver can group
-    let eps = vec![
+    let eps = [
         SimpleEpisodeData {
             id: 1,
             title: "A".into(),
@@ -433,7 +433,7 @@ fn resolver_returns_none_when_episodes_empty() {
 fn resolver_uses_first_successful_resolver() {
     let service = make_resolver_service(vec![]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 1, 1),
         make_rss_episode(2, 1, "S1E2", 2, 1),
     ];
@@ -452,7 +452,7 @@ fn resolver_falls_back_to_next_resolver() {
     let service = make_resolver_service(vec![]);
 
     // No season numbers, but has dates -> year resolver
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "Ep 1", 1, 6), // June
         make_episode_with_title(2, "Ep 2", 1, 3), // March 2024
     ];
@@ -492,7 +492,7 @@ fn resolver_matches_config_by_feed_url() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 1, 1),
         make_rss_episode(2, 1, "S1E2", 1, 2),
     ];
@@ -532,7 +532,7 @@ fn resolver_matches_config_by_guid() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 1, 1),
         make_rss_episode(2, 1, "S1E2", 1, 2),
     ];
@@ -603,7 +603,7 @@ fn resolver_filters_by_require_regex() {
         ],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "Ep1 Main Story", 1, 1),
         make_episode_with_title(2, "Bonus: Behind the Scenes", 1, 2),
         make_episode_with_title(3, "Ep2 Main Story", 1, 3),
@@ -664,7 +664,7 @@ fn resolver_filter_regex_is_case_insensitive() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "BONUS Episode", 1, 1),
         make_episode_with_title(2, "Regular Episode", 1, 2),
     ];
@@ -738,7 +738,7 @@ fn resolver_filtered_definitions_process_before_fallbacks() {
         ],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "Regular Ep", 1, 1),
         make_episode_with_title(2, "Bonus Ep", 1, 2),
         make_episode_with_title(3, "Another Regular", 1, 3),
@@ -796,7 +796,7 @@ fn resolver_grouped_structure_produces_single_playlist_with_groups() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 1, 1),
         make_rss_episode(2, 1, "S1E2", 1, 2),
         make_rss_episode(3, 2, "S2E1", 3, 1),
@@ -858,7 +858,7 @@ fn resolver_episode_ids_sorted_by_published_at_in_output() {
     }]);
 
     // Episodes in reverse chronological order
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 3, 1), // March
         make_rss_episode(2, 1, "S1E2", 1, 1), // January
         make_rss_episode(3, 1, "S1E3", 2, 1), // February
@@ -902,7 +902,7 @@ fn resolver_sorts_ungrouped_episode_ids() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 6, 1),
         // No season number -- becomes ungrouped
         SimpleEpisodeData {
@@ -999,7 +999,7 @@ fn preview_returns_preview_grouping_with_single_playlist() {
         }],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 1, 1),
         make_rss_episode(2, 1, "S1E2", 2, 1),
         make_rss_episode(3, 2, "S2E1", 3, 1),
@@ -1075,7 +1075,7 @@ fn preview_tracks_claimed_by_others() {
         ],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "Ep 1", 1, 1),
         make_episode_with_title(2, "Ep 2", 1, 2),
     ];
@@ -1140,7 +1140,7 @@ fn preview_sorts_episode_ids_by_published_at() {
     }]);
 
     // Episodes in reverse chronological order
-    let eps = vec![
+    let eps = [
         make_rss_episode(1, 1, "S1E1", 3, 1), // March
         make_rss_episode(2, 1, "S1E2", 1, 1), // January
         make_rss_episode(3, 1, "S1E3", 2, 1), // February
@@ -1211,7 +1211,7 @@ fn preview_fallback_definition_has_empty_claimed_by_others() {
         ],
     }]);
 
-    let eps = vec![
+    let eps = [
         make_episode_with_title(1, "Main Ep 1", 1, 1),
         make_episode_with_title(2, "Bonus: Extra", 1, 2),
         make_episode_with_title(3, "Main Ep 2", 1, 3),
@@ -1293,7 +1293,7 @@ fn partition_by_season_creates_sub_groups() {
         episode_item: None,
     };
 
-    let episodes = vec![
+    let episodes = [
         SimpleEpisodeData {
             id: 1,
             title: "[ProfA 1] Topic".to_string(),
