@@ -43,7 +43,7 @@ User clones data repo locally
                                                                          audiflow app fetches
 ```
 
-- **audiflow-smartplaylist** (data repo): Static JSON files on GitHub, source of truth
+- **audiflow-preset** (data repo): Static JSON files on GitHub, source of truth
 - **GitHub Pages / GCS**: Mirrors the data repo; the mobile app fetches configs from here
 - **audiflow app**: Consumes configs via `audiflow_domain` with local caching
 - **This repo**: Local web editor that reads/writes files in a cloned data repo

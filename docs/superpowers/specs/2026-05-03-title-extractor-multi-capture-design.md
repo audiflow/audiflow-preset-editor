@@ -168,7 +168,7 @@ React: remove assertions referencing the `group` input from
   multi-capture example.
 - `docs/integration/editor-to-schema.md`: update if any `group:` examples
   appear.
-- `docs/integration/smartplaylist-contract.md`: same — scrub `group:` examples
+- `docs/integration/preset-contract.md`: same — scrub `group:` examples
   if present.
 - Any embedded fixture/example JSON using `group:` is converted to
   `template: "${N}"`.

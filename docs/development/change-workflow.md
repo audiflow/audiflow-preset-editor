@@ -5,7 +5,7 @@
 - Read docs/overview.md for repository purpose and concepts
 - Read docs/architecture/module-boundaries.md to understand crate/package boundaries
 - If the change involves schemas, read docs/integration/editor-to-schema.md
-- If the change involves file structure, read docs/integration/smartplaylist-contract.md
+- If the change involves file structure, read docs/integration/preset-contract.md
 - Identify whether the change is localized to one crate/package or crosses boundaries
 
 ## During implementation
@@ -35,7 +35,7 @@ When modifying JSON Schema or related models:
 
 Update documentation when:
 - Architecture changes (new crates, changed boundaries) -> docs/architecture/*, `.claude/rules/project/architecture.md`
-- Schema or config format changes -> docs/integration/editor-to-schema.md, docs/integration/smartplaylist-contract.md, docs/schema-reference.md
+- Schema or config format changes -> docs/integration/editor-to-schema.md, docs/integration/preset-contract.md, docs/schema-reference.md
 - New API endpoints -> `.claude/rules/project/architecture.md` (route table)
 - New concepts or entry points -> docs/overview.md
 - Process changes -> this document, docs/development/review-checklist.md

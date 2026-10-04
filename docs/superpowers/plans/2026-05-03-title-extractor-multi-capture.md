@@ -808,7 +808,7 @@ git commit -m "feat(sp_react): update TitleExtractor locale strings for \${N} sy
 
 **Files:**
 - Modify: `docs/schema-reference.md` (TitleExtractor section)
-- Inspect: `docs/integration/editor-to-schema.md`, `docs/integration/smartplaylist-contract.md` — only edit if they show a `group:` example or use `{value}` for templates
+- Inspect: `docs/integration/editor-to-schema.md`, `docs/integration/preset-contract.md` — only edit if they show a `group:` example or use `{value}` for templates
 
 - [ ] **Step 1: Find the TitleExtractor section**
 

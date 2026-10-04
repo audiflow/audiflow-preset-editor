@@ -8,7 +8,7 @@ locally cloned data repo. Users manage git operations themselves.
 
 Part of the audiflow podcast ecosystem. This repo owns the editor UX, JSON Schema
 definitions (`crates/preset_core/assets/`), and local-first editing workflow. The sibling
-repo `audiflow-smartplaylist` holds config JSON files for all environments (prod/staging/dev,
+repo `audiflow-preset` holds config JSON files for all environments (prod/staging/dev,
 deployed via GitHub Pages). The `audiflow` Flutter app consumes configs from hosted mirrors.
 
 ## Responsibilities
@@ -56,7 +56,7 @@ make test                          # All tests
 - docs/architecture/system-overview.md -- Data flow and design constraints
 - docs/architecture/module-boundaries.md -- Crate/package boundaries
 - docs/integration/editor-to-schema.md -- Schema ownership and update process
-- docs/integration/smartplaylist-contract.md -- Data repo file structure contract
+- docs/integration/preset-contract.md -- Data repo file structure contract
 - docs/development/change-workflow.md -- How to make changes safely
 - docs/development/review-checklist.md -- PR review criteria
 
