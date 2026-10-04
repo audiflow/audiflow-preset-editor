@@ -21,10 +21,7 @@ impl std::fmt::Display for UniquenessConflict {
     }
 }
 
-fn find_guid_conflict(
-    candidate: &PresetMeta,
-    others: &[PresetMeta],
-) -> Option<UniquenessConflict> {
+fn find_guid_conflict(candidate: &PresetMeta, others: &[PresetMeta]) -> Option<UniquenessConflict> {
     let guid = candidate.podcast_guid.as_deref()?;
     others.iter().find_map(|other| {
         (other.id != candidate.id && other.podcast_guid.as_deref() == Some(guid)).then(|| {
@@ -65,10 +62,7 @@ fn find_feed_url_conflicts(
 ///
 /// Entries in `others` whose `id` matches `candidate.id` are skipped,
 /// so callers need not pre-filter the list.
-pub fn check_uniqueness(
-    candidate: &PresetMeta,
-    others: &[PresetMeta],
-) -> Vec<UniquenessConflict> {
+pub fn check_uniqueness(candidate: &PresetMeta, others: &[PresetMeta]) -> Vec<UniquenessConflict> {
     let mut conflicts: Vec<UniquenessConflict> =
         find_guid_conflict(candidate, others).into_iter().collect();
     conflicts.extend(find_feed_url_conflicts(candidate, others));

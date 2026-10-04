@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use preset_core::models::{PresetMeta, PlaylistDefinition, RootMeta};
+use preset_core::models::{PlaylistDefinition, PresetMeta, RootMeta};
 use preset_core::schema::SchemaType;
 
 use crate::config_walker;

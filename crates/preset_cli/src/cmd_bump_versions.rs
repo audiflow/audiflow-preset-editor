@@ -24,9 +24,9 @@ fn repo_relative_path(path: &Path) -> anyhow::Result<(String, PathBuf)> {
     let git_cwd = if path.is_dir() {
         path.to_path_buf()
     } else {
-        path.parent().map(Path::to_path_buf).unwrap_or_else(|| {
-            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-        })
+        path.parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_else(|| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")))
     };
     let output = Command::new("git")
         .current_dir(&git_cwd)

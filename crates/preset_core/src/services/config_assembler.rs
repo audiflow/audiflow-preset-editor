@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::models::{PresetConfig, PresetMeta, PlaylistDefinition};
+use crate::models::{PlaylistDefinition, PresetConfig, PresetMeta};
 
 /// Assembles a full PresetConfig from pattern metadata and playlist
 /// definitions.

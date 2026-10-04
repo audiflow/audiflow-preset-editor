@@ -350,11 +350,17 @@ mod tests {
         });
         let def: PlaylistDefinition = serde_json::from_value(json).unwrap();
         assert_eq!(def.group_item.as_ref().unwrap().show_thumbnail, Some(false));
-        assert_eq!(def.episode_item.as_ref().unwrap().show_thumbnail, Some(false));
+        assert_eq!(
+            def.episode_item.as_ref().unwrap().show_thumbnail,
+            Some(false)
+        );
 
         let out = serde_json::to_value(&def).unwrap();
         assert_eq!(out["groupItem"]["showThumbnail"], serde_json::json!(false));
-        assert_eq!(out["episodeItem"]["showThumbnail"], serde_json::json!(false));
+        assert_eq!(
+            out["episodeItem"]["showThumbnail"],
+            serde_json::json!(false)
+        );
     }
 
     #[test]
