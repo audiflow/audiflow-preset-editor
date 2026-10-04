@@ -8,7 +8,7 @@ Provide a local web editor that lets users create and manage smart playlist conf
 
 This repository is part of the audiflow podcast ecosystem:
 - **audiflow** (Flutter app): Consumes configs from hosted mirrors (GitHub Pages)
-- **audiflow-smartplaylist** (data repo): Static JSON files for all environments (prod/staging/dev), deployed to GitHub Pages from versioned branches
+- **audiflow-preset** (data repo): Static JSON files for all environments (prod/staging/dev), deployed to GitHub Pages from versioned branches
 - **This repo** (editor): Reads/writes config files in a locally cloned data repo
 
 ## High-level structure
@@ -20,7 +20,7 @@ This repository is part of the audiflow podcast ecosystem:
 
 ## Main data flow
 
-1. User clones the data repo (`audiflow-smartplaylist`) locally
+1. User clones the data repo (`audiflow-preset`) locally
 2. User starts the editor: `cargo run -- serve --data-dir /path/to/data-repo`
 3. `preset_server` reads split config files from the data directory via `LocalConfigRepository`
 4. `preset_react` SPA loads in the browser, fetches config data via REST API

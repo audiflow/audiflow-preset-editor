@@ -24,7 +24,7 @@ operations (commit, push, PR) themselves.
 - Hosting or deploying config data (owned by data repo CI pipelines)
 - Managing git operations on data repos (user responsibility)
 - Mobile app playback, caching, or UI (owned by `audiflow` Flutter app)
-- Production, staging, or dev data content (owned by `audiflow-smartplaylist` repo, branched by environment)
+- Production, staging, or dev data content (owned by `audiflow-preset` repo, branched by environment)
 
 ## Main concepts
 
@@ -35,7 +35,7 @@ operations (commit, push, PR) themselves.
 - **Split config**: The three-level file hierarchy (`patterns/meta.json` -> `{id}/meta.json` -> `{id}/playlists/{pid}.json`).
 - **Schema**: Three JSON Schema files in `crates/preset_core/assets/` that validate each level of the split config.
 - **Claiming**: Higher-priority playlist definitions claim episodes during preview, preventing duplicates in lower-priority definitions.
-- **Data repo**: A git repository containing JSON config files (`audiflow-smartplaylist` for all environments).
+- **Data repo**: A git repository containing JSON config files (`audiflow-preset` for all environments).
 - **Cross-pattern uniqueness**: Validation ensuring no two patterns share the same podcastGuid or feedUrl values.
 
 ## Primary entry points
@@ -55,7 +55,7 @@ operations (commit, push, PR) themselves.
 - docs/architecture/system-overview.md
 - docs/architecture/module-boundaries.md
 - docs/integration/editor-to-schema.md
-- docs/integration/smartplaylist-contract.md
+- docs/integration/preset-contract.md
 - docs/development/change-workflow.md
 
 ## When to update

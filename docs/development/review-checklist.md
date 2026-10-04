@@ -17,7 +17,7 @@
 ## Schema and contracts
 
 - If JSON Schema files changed, were all consumers listed in docs/integration/editor-to-schema.md notified?
-- If file structure changed, was docs/integration/smartplaylist-contract.md updated?
+- If file structure changed, was docs/integration/preset-contract.md updated?
 - Do schema conformance tests pass (`crates/preset_core/tests/schema_tests.rs`)?
 
 ## Uniqueness and identifiers

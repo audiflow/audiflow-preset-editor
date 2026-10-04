@@ -54,7 +54,7 @@ This document covers:
 
 ## Related documents
 
-- docs/integration/smartplaylist-contract.md -- file structure the schemas validate
+- docs/integration/preset-contract.md -- file structure the schemas validate
 - docs/architecture/module-boundaries.md -- preset_core owns schemas, preset_react mirrors as Zod
 - docs/development/change-workflow.md -- steps for schema changes
 - docs/schema-reference.md -- complete field-level schema reference (v6)

@@ -9,8 +9,8 @@ SERVER_PORT ?= 8080
 ROOT        := $(shell pwd)
 PRESET_REACT    := $(ROOT)/packages/preset_react
 
-# Data directory (path to a cloned audiflow-smartplaylist data repo)
-DATA_DIR    ?= $(ROOT)/../audiflow-smartplaylist
+# Data directory (path to a cloned audiflow-preset data repo)
+DATA_DIR    ?= $(ROOT)/../audiflow-preset
 
 # Vite env: point React dev server at the API
 export VITE_API_BASE_URL ?= http://localhost:$(SERVER_PORT)

@@ -1,8 +1,8 @@
-# Smart Playlist Data Repo Contract
+# Preset Data Repo Contract
 
 ## Purpose
 
-Documents the file structure and format contract between this editor and the smart playlist data repository (`audiflow-smartplaylist`), which holds config data for all environments (prod, staging, dev) on separate versioned branches.
+Documents the file structure and format contract between this editor and the preset data repository (`audiflow-preset`), which holds config data for all environments (prod, staging, dev) on separate versioned branches.
 
 ## Scope
 
