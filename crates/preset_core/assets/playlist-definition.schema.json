@@ -151,7 +151,7 @@
         },
         "pattern": {
           "type": "string",
-          "description": "A regex tested against the selected source field. Episodes whose source matches are assigned to this group."
+          "description": "A case-insensitive regex tested against the selected source field. Episodes whose source matches are assigned to this group."
         }
       }
     },
