@@ -358,6 +358,37 @@ fn category_groups_episodes_by_pattern() {
 }
 
 #[test]
+fn category_pattern_matches_case_insensitively() {
+    // The app compiles classifier patterns with caseSensitive: false; the
+    // preview must agree or episodes like "The Empire Of Gold" drop out.
+    let resolver = CategoryResolver;
+    let mut def = minimal_definition("titleClassifier");
+    def.grouping.static_classifiers = Some(vec![GroupDef {
+        id: "empire".to_string(),
+        display_name: "Empire of Gold".to_string(),
+        pattern: Some(Matcher {
+            source: "title".to_string(),
+            pattern: r"Empire of Gold".to_string(),
+        }),
+        group_listing: None,
+        group_item: None,
+        episode_listing: None,
+        episode_item: None,
+        numbering_extractor: None,
+    }]);
+
+    let episodes = vec![
+        make_episode(1, "Empire of Gold | 1. Matricide"),
+        make_episode(2, "Introducing...The Empire Of Gold"),
+    ];
+    let refs = as_refs(&episodes);
+    let result = resolver.resolve(&refs, Some(&def)).unwrap();
+
+    assert_eq!(result.playlists[0].episode_ids, vec![1, 2]);
+    assert!(result.ungrouped_episode_ids.is_empty());
+}
+
+#[test]
 fn category_ungrouped_when_no_fallback_group() {
     let resolver = CategoryResolver;
     let mut def = minimal_definition("titleClassifier");

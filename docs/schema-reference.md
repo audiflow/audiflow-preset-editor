@@ -640,7 +640,7 @@ Each classifier matches episodes by title pattern. Classifiers are evaluated in 
 |-------|------|----------|-------------|
 | `id` | string | yes | Unique identifier within the playlist. |
 | `displayName` | string | yes | Name shown to users. Always used as-is (not overridden by `titleExtractor`). |
-| `pattern` | string | no | Regex matched against episode titles. Omit to create a catch-all. |
+| `pattern` | string | no | Regex matched against episode titles. Case-insensitive for `titleClassifier` (the legacy `titleDiscovery` fallback stays case-sensitive). Omit to create a catch-all. |
 | `groupItem` | object | no | Per-classifier override for group card display. |
 | `episodeListing` | object | no | Per-classifier override for episode arrangement. |
 | `episodeItem` | object | no | Per-classifier override for episode row display. |

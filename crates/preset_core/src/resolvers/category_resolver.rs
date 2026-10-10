@@ -140,7 +140,10 @@ fn build_pattern_groups(group_defs: &[GroupDef]) -> Vec<PatternGroup> {
         .iter()
         .filter_map(|g| {
             let matcher = g.pattern.as_ref()?;
-            let regex = Regex::new(&matcher.pattern).ok()?;
+            // Match case-insensitively like episodeFilters and the app's
+            // TitleClassifierResolver (caseSensitive: false), so the preview
+            // groups episodes the same way the app does.
+            let regex = Regex::new(&format!("(?i){}", matcher.pattern)).ok()?;
             Some(PatternGroup {
                 regex,
                 source: matcher.source.clone(),
