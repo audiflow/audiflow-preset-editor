@@ -72,15 +72,18 @@ jobs:
           # Publish in dependency order; --no-verify skips build (CI already tests)
           for crate in audiflow-preset-core audiflow-preset-server audiflow-preset-editor; do
             echo "Publishing $crate..."
-            # Check if this version is already published
-            VERSION=$(cargo metadata --no-deps --format-version 1 \
-              | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['packages']; print([p['version'] for p in pkgs if p['name']=='$crate'][0])")
-            if cargo search "$crate" 2>/dev/null | grep -q "^${crate} = \"${VERSION}\""; then
-              echo "$crate@$VERSION already published — skipping"
-            else
-              cargo publish -p "$crate" --no-verify
+            # Let crates.io decide whether the version exists: a `cargo search`
+            # pre-check missed published versions in CI, failing the publish and
+            # blocking the binary release for merges that did not bump the version.
+            if output=$(cargo publish -p "$crate" --no-verify 2>&1); then
+              echo "$output"
               echo "Waiting for crates.io index to update..."
               sleep 30
+            elif grep -q "already exists on crates.io index" <<<"$output"; then
+              echo "$crate is already published at this version — skipping"
+            else
+              echo "$output"
+              exit 1
             fi
           done
 
