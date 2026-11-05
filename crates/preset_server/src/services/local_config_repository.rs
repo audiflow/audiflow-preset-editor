@@ -264,7 +264,7 @@ mod tests {
                     "id": "test-pattern",
                     "dataVersion": 1,
                     "displayName": "Test Pattern",
-                    "feedUrlHint": "https://example.com/feed.xml",
+                    "feedUrlHints": ["https://example.com/feed.xml"],
                     "playlistCount": 1
                 }
             ]

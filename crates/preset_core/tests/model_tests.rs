@@ -669,7 +669,7 @@ fn root_meta_round_trip() {
                 "id": "coten",
                 "dataVersion": 1,
                 "displayName": "COTEN RADIO",
-                "feedUrlHint": "https://feed.example.com/rss",
+                "feedUrlHints": ["https://feed.example.com/rss", "https://old.example.com/rss"],
                 "playlistCount": 3
             }
         ]
@@ -694,7 +694,7 @@ fn preset_summary_round_trip() {
         "id": "coten",
         "dataVersion": 2,
         "displayName": "COTEN RADIO",
-        "feedUrlHint": "https://feed.example.com/rss",
+        "feedUrlHints": ["https://feed.example.com/rss", "https://old.example.com/rss"],
         "playlistCount": 5
     });
 
@@ -704,7 +704,13 @@ fn preset_summary_round_trip() {
     assert_eq!(summary.playlist_count, 5);
 
     let serialized = serde_json::to_value(&summary).unwrap();
-    assert_eq!(serialized["feedUrlHint"], "https://feed.example.com/rss");
+    assert_eq!(
+        serialized["feedUrlHints"],
+        json!([
+            "https://feed.example.com/rss",
+            "https://old.example.com/rss"
+        ])
+    );
 }
 
 // --- NumberingExtractor JSON serialization ---

@@ -7,7 +7,7 @@ export const presetSummarySchema = z.object({
   id: z.string(),
   dataVersion: z.number(),
   displayName: z.string(),
-  feedUrlHint: z.string(),
+  feedUrlHints: z.array(z.string()),
   playlistCount: z.number(),
 });
 
