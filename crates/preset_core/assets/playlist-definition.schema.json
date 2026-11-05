@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://audiflow.app/schema/v7/playlist-definition.json",
+  "$id": "https://audiflow.app/schema/v8/playlist-definition.json",
   "title": "Playlist Definition",
   "description": "Defines how a playlist organizes, filters, sorts, and displays episodes for a podcast. Each definition file lives at {presetId}/playlists/{id}.json. Multiple definitions under the same preset share the podcast's episode pool and claim episodes based on priority.",
   "type": "object",

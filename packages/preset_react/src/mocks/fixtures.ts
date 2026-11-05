@@ -8,14 +8,14 @@ export const PRESET_SUMMARIES: PresetSummary[] = [
     id: 'pattern-1',
     dataVersion: 1,
     displayName: 'Test Podcast Alpha',
-    feedUrlHint: 'https://example.com/alpha/feed.xml',
+    feedUrlHints: ['https://example.com/alpha/feed.xml'],
     playlistCount: 2,
   },
   {
     id: 'pattern-2',
     dataVersion: 1,
     displayName: 'Test Podcast Beta',
-    feedUrlHint: 'https://example.com/beta/feed.xml',
+    feedUrlHints: ['https://example.com/beta/feed.xml'],
     playlistCount: 1,
   },
 ];

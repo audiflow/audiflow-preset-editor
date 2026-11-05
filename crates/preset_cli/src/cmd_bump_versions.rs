@@ -468,7 +468,7 @@ mod tests {
         // Root meta
         std::fs::write(
             presets.join("meta.json"),
-            r#"{"dataVersion": 1, "schemaVersion": 7, "presets": [{"id": "show_a", "dataVersion": 1, "displayName": "Show A", "feedUrlHint": "https://example.com", "playlistCount": 1}]}"#,
+            r#"{"dataVersion": 1, "schemaVersion": 8, "presets": [{"id": "show_a", "dataVersion": 1, "displayName": "Show A", "feedUrlHints": ["https://example.com"], "playlistCount": 1}]}"#,
         )
         .unwrap();
 
@@ -561,7 +561,7 @@ mod tests {
 
         std::fs::write(
             presets.join("meta.json"),
-            r#"{"dataVersion": 1, "schemaVersion": 7, "presets": [{"id": "show_a", "dataVersion": 1, "displayName": "Show A", "feedUrlHint": "https://example.com", "playlistCount": 1}]}"#,
+            r#"{"dataVersion": 1, "schemaVersion": 8, "presets": [{"id": "show_a", "dataVersion": 1, "displayName": "Show A", "feedUrlHints": ["https://example.com"], "playlistCount": 1}]}"#,
         )
         .unwrap();
 

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://audiflow.app/schema/v7/preset-meta.json",
+  "$id": "https://audiflow.app/schema/v8/preset-meta.json",
   "title": "Preset Meta",
   "description": "Per-preset metadata file at {presetId}/meta.json. Contains feed matching rules to identify the podcast, and an ordered list of playlist definitions. The app uses podcastGuid and feedUrls for matching.",
   "type": "object",

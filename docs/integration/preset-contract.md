@@ -61,6 +61,11 @@ presets/
 - `dataVersion` in root `meta.json`: incremented by the editor or `bump-versions` CLI when presets change
 - `schemaVersion` in root `meta.json`: tracks which schema version the data conforms to
 
+### Root index entries
+
+- Root `meta.json` lists each preset ID exactly once; `audiflow-editor validate` fails on repeats
+- `feedUrlHints` holds one entry per feed URL, so a podcast that moved feeds needs no second entry
+
 ## Data flow
 
 ```
