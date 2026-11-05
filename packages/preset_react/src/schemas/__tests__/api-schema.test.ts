@@ -28,6 +28,22 @@ describe('presetSummarySchema', () => {
     expect(result.playlistCount).toBe(3);
   });
 
+  it.each([
+    ['empty list', []],
+    ['blank hint', ['']],
+    ['repeated hint', ['https://a.example.com', 'https://a.example.com']],
+  ])('rejects feedUrlHints with %s', (_label, feedUrlHints) => {
+    expect(() =>
+      presetSummarySchema.parse({
+        id: 'x',
+        dataVersion: 1,
+        displayName: 'X',
+        feedUrlHints,
+        playlistCount: 1,
+      }),
+    ).toThrow();
+  });
+
   it('rejects the legacy scalar feedUrlHint', () => {
     expect(() =>
       presetSummarySchema.parse({
