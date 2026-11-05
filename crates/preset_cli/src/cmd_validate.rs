@@ -40,7 +40,7 @@ fn validate_all(patterns_dir: &Path, validator: &Validator) -> anyhow::Result<i3
         Ok(())
     })?;
 
-    error_count += validate_root_index_uniqueness(patterns_dir)?;
+    error_count += validate_root_index_uniqueness(&patterns_dir.join("meta.json"))?;
     error_count += validate_cross_pattern_uniqueness(patterns_dir)?;
     error_count += validate_preset_id_integrity(patterns_dir)?;
 
@@ -78,12 +78,16 @@ fn validate_files(data_dir: &str, files: &[String], validator: &Validator) -> an
                 error_count += validate_file(p, schema_type, validator)?;
                 Ok(())
             })?;
-            error_count += validate_root_index_uniqueness(&presets_dir)?;
+            error_count += validate_root_index_uniqueness(&presets_dir.join("meta.json"))?;
             error_count += validate_cross_pattern_uniqueness(&presets_dir)?;
             error_count += validate_preset_id_integrity(&presets_dir)?;
         } else {
             let schema_type = config_walker::detect_schema_type(&path);
+            let is_root_index = matches!(schema_type, SchemaType::PresetIndex);
             error_count += validate_file(&path, schema_type, validator)?;
+            if is_root_index {
+                error_count += validate_root_index_uniqueness(&path)?;
+            }
         }
     }
 
@@ -140,12 +144,11 @@ fn validate_file(
 /// compare whole items, so it cannot catch two entries sharing just an `id`, and
 /// consumers keying on `id` would silently keep one of them.
 /// Returns the number of duplicated IDs.
-fn validate_root_index_uniqueness(presets_dir: &Path) -> anyhow::Result<u32> {
-    let root_meta = presets_dir.join("meta.json");
+fn validate_root_index_uniqueness(root_meta: &Path) -> anyhow::Result<u32> {
     if !root_meta.exists() {
         return Ok(0);
     }
-    let content = std::fs::read_to_string(&root_meta)?;
+    let content = std::fs::read_to_string(root_meta)?;
     let root: serde_json::Value = serde_json::from_str(&content)
         .map_err(|e| anyhow::anyhow!("Invalid JSON in {}: {e}", root_meta.display()))?;
 
@@ -283,9 +286,8 @@ mod tests {
         assert!(find_duplicate_preset_ids(&json!({})).is_empty());
     }
 
-    #[test]
-    fn validate_all_fails_on_duplicate_root_entries() {
-        let tmp = tempfile::TempDir::new().unwrap();
+    /// A root index that passes the schema, so only the duplicate check can fail it.
+    fn root_with_duplicate_entries() -> serde_json::Value {
         let summary = json!({
             "id": "show_a",
             "dataVersion": 1,
@@ -293,14 +295,34 @@ mod tests {
             "feedUrlHints": ["https://example.com/rss"],
             "playlistCount": 1
         });
-        let root = json!({
+        json!({
             "dataVersion": 1,
             "schemaVersion": 8,
             "presets": [summary, summary]
-        });
+        })
+    }
+
+    #[test]
+    fn validate_all_fails_on_duplicate_root_entries() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let root = root_with_duplicate_entries();
         std::fs::write(tmp.path().join("meta.json"), root.to_string()).unwrap();
 
         let validator = Validator::from_embedded().unwrap();
         assert_eq!(validate_all(tmp.path(), &validator).unwrap(), 1);
+    }
+
+    #[test]
+    fn validating_the_root_file_directly_fails_on_duplicate_entries() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let presets = tmp.path().join("presets");
+        std::fs::create_dir_all(&presets).unwrap();
+        let root_path = presets.join("meta.json");
+        let root = root_with_duplicate_entries();
+        std::fs::write(&root_path, root.to_string()).unwrap();
+
+        let validator = Validator::from_embedded().unwrap();
+        let files = [root_path.display().to_string()];
+        assert_eq!(validate_files(".", &files, &validator).unwrap(), 1);
     }
 }
