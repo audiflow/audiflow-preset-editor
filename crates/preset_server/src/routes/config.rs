@@ -263,6 +263,8 @@ pub async fn update_preset_meta(
         )));
     }
 
+    require_feed_url_hints(&existing)?;
+
     // Check cross-preset uniqueness (podcastGuid, feedUrls).
     let candidate: PresetMeta = serde_json::from_value(existing.clone())
         .map_err(|e| AppError::internal(format!("Preset meta deserialization error: {e}")))?;
@@ -504,7 +506,7 @@ fn sync_root_meta(
                 .and_then(|v| v.as_array())
                 .map_or(0, |a| a.len());
             entry["playlistCount"] = Value::from(playlists_count);
-            entry["feedUrlHints"] = feed_url_hints(meta);
+            entry["feedUrlHints"] = serde_json::json!(feed_url_hints(meta));
 
             if let Some(name) = display_name {
                 entry["displayName"] = Value::String(name.to_string());
@@ -555,7 +557,7 @@ fn check_cross_preset_uniqueness(
 ///
 /// Blank and repeated URLs are dropped because the preset-meta schema allows them
 /// but the preset-index schema does not, and writing them would invalidate the index.
-fn feed_url_hints(meta: &Value) -> Value {
+fn feed_url_hints(meta: &Value) -> Vec<&str> {
     let mut hints: Vec<&str> = Vec::new();
     let urls = meta
         .get("feedUrls")
@@ -563,12 +565,24 @@ fn feed_url_hints(meta: &Value) -> Value {
         .into_iter()
         .flatten()
         .filter_map(|v| v.as_str());
-    for url in urls {
+    for url in urls.map(str::trim) {
         if !url.is_empty() && !hints.contains(&url) {
             hints.push(url);
         }
     }
-    serde_json::json!(hints)
+    hints
+}
+
+/// Rejects metadata that would leave the root index without a hint. Run before
+/// writing anything, since the preset-meta schema accepts blank URLs but the
+/// preset-index schema requires at least one hint.
+fn require_feed_url_hints(meta: &Value) -> Result<(), AppError> {
+    if feed_url_hints(meta).is_empty() {
+        return Err(AppError::bad_request(
+            "\"feedUrls\" must contain at least one non-blank URL",
+        ));
+    }
+    Ok(())
 }
 
 /// Merges `body` into `existing` for `update_preset_meta`.
@@ -600,19 +614,32 @@ mod tests {
             json!({ "feedUrls": ["https://new.example.com/rss", "https://old.example.com/rss"] });
         assert_eq!(
             feed_url_hints(&meta),
-            json!(["https://new.example.com/rss", "https://old.example.com/rss"])
+            vec!["https://new.example.com/rss", "https://old.example.com/rss"]
         );
     }
 
     #[test]
     fn feed_url_hints_drops_blank_and_repeated_urls() {
-        let meta = json!({ "feedUrls": ["https://a.example.com", "", "https://a.example.com"] });
-        assert_eq!(feed_url_hints(&meta), json!(["https://a.example.com"]));
+        let meta =
+            json!({ "feedUrls": ["https://a.example.com", " ", "", "https://a.example.com"] });
+        assert_eq!(feed_url_hints(&meta), vec!["https://a.example.com"]);
     }
 
     #[test]
     fn feed_url_hints_is_empty_without_feed_urls() {
-        assert_eq!(feed_url_hints(&json!({})), json!([]));
+        assert!(feed_url_hints(&json!({})).is_empty());
+    }
+
+    #[test]
+    fn require_feed_url_hints_rejects_meta_with_only_blank_urls() {
+        let err = require_feed_url_hints(&json!({ "feedUrls": ["", " "] })).unwrap_err();
+        assert_eq!(err.status, axum::http::StatusCode::BAD_REQUEST);
+    }
+
+    #[test]
+    fn require_feed_url_hints_accepts_a_usable_url() {
+        let meta = json!({ "feedUrls": ["https://a.example.com"] });
+        assert!(require_feed_url_hints(&meta).is_ok());
     }
 
     #[test]
