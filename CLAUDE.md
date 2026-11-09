@@ -52,7 +52,7 @@ make test                          # All tests
 ## Key references
 
 - docs/overview.md -- Purpose, concepts, entry points
-- docs/schema-reference.md -- Complete v5 schema field reference
+- docs/schema-reference.md -- Complete v8 schema field reference
 - docs/architecture/system-overview.md -- Data flow and design constraints
 - docs/architecture/module-boundaries.md -- Crate/package boundaries
 - docs/integration/editor-to-schema.md -- Schema ownership and update process

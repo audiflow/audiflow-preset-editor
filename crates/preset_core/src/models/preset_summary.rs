@@ -12,6 +12,6 @@ pub struct PresetSummary {
     pub data_version: i32,
 
     pub display_name: String,
-    pub feed_url_hint: String,
+    pub feed_url_hints: Vec<String>,
     pub playlist_count: i32,
 }

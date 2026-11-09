@@ -16,12 +16,44 @@ describe('presetSummarySchema', () => {
       id: 'podcast-abc',
       dataVersion: 1,
       displayName: 'My Podcast',
-      feedUrlHint: 'https://example.com/feed.xml',
+      feedUrlHints: ['https://example.com/feed.xml', 'https://old.example.com/feed.xml'],
       playlistCount: 3,
     });
     expect(result.id).toBe('podcast-abc');
+    expect(result.feedUrlHints).toEqual([
+      'https://example.com/feed.xml',
+      'https://old.example.com/feed.xml',
+    ]);
     expect(result.dataVersion).toBe(1);
     expect(result.playlistCount).toBe(3);
+  });
+
+  it.each([
+    ['empty list', []],
+    ['blank hint', ['']],
+    ['repeated hint', ['https://a.example.com', 'https://a.example.com']],
+  ])('rejects feedUrlHints with %s', (_label, feedUrlHints) => {
+    expect(() =>
+      presetSummarySchema.parse({
+        id: 'x',
+        dataVersion: 1,
+        displayName: 'X',
+        feedUrlHints,
+        playlistCount: 1,
+      }),
+    ).toThrow();
+  });
+
+  it('rejects the legacy scalar feedUrlHint', () => {
+    expect(() =>
+      presetSummarySchema.parse({
+        id: 'x',
+        dataVersion: 1,
+        displayName: 'X',
+        feedUrlHint: 'https://example.com/feed.xml',
+        playlistCount: 1,
+      }),
+    ).toThrow();
   });
 
   it('rejects missing fields', () => {

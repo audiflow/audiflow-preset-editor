@@ -1,14 +1,14 @@
-# Schema Reference (v6)
+# Schema Reference (v8)
 
-Schema reference for audiflow smart playlist configuration files. Covers all three schema levels: pattern index, pattern meta, and playlist definition.
+Schema reference for audiflow smart playlist configuration files. Covers all three schema levels: preset index, preset meta, and playlist definition.
 
-JSON Schema definitions are versioned at **v6**; the pattern-index file format is versioned independently via its own `schemaVersion` field (see [Pattern Index](#pattern-index)).
+JSON Schema definitions are versioned at **v8**; the preset-index file format is versioned independently via its own `schemaVersion` field (see [Preset Index](#preset-index)).
 
 ## Table of Contents
 
 - [Three-Level Hierarchy](#three-level-hierarchy)
-- [Pattern Index](#pattern-index)
-- [Pattern Meta](#pattern-meta)
+- [Preset Index](#preset-index)
+- [Preset Meta](#preset-meta)
 - [Playlist Definition](#playlist-definition)
   - [Required Fields](#required-fields)
   - [episodeFilters](#episodefilters)
@@ -24,7 +24,7 @@ JSON Schema definitions are versioned at **v6**; the pattern-index file format i
 - [NumberingExtractor](#numberingextractor)
 - [StaticClassifier](#staticclassifier)
 - [Sort Rules](#sort-rules)
-- [Pattern ID Derivation](#pattern-id-derivation)
+- [Preset ID Derivation](#preset-id-derivation)
 
 ---
 
@@ -33,62 +33,62 @@ JSON Schema definitions are versioned at **v6**; the pattern-index file format i
 Configuration data is organized in a three-level file hierarchy:
 
 ```
-patterns/
-  meta.json                          # Level 1: Pattern Index
+presets/
+  meta.json                          # Level 1: Preset Index
   {presetId}/
-    meta.json                        # Level 2: Pattern Meta
+    meta.json                        # Level 2: Preset Meta
     playlists/
       {playlistId}.json              # Level 3: Playlist Definition
 ```
 
-**Level 1 -- Pattern Index** (`presets/meta.json`): Root index listing all available patterns. The app fetches this first and uses `feedUrlHint` for fast pre-filtering.
+**Level 1 -- Preset Index** (`presets/meta.json`): Root index listing all available presets. The app fetches this first and uses `feedUrlHints` for fast pre-filtering.
 
-**Level 2 -- Pattern Meta** (`{presetId}/meta.json`): Per-podcast metadata containing feed URLs for matching and an ordered list of playlist IDs.
+**Level 2 -- Preset Meta** (`{presetId}/meta.json`): Per-podcast metadata containing feed URLs for matching and an ordered list of playlist IDs.
 
 **Level 3 -- Playlist Definition** (`{presetId}/playlists/{playlistId}.json`): Individual playlist configuration defining how episodes are filtered, grouped, and displayed.
 
 ---
 
-## Pattern Index
+## Preset Index
 
 **File:** `presets/meta.json`
 
-**Schema:** `https://audiflow.app/schema/v6/pattern-index.json`
+**Schema:** `https://audiflow.app/schema/v8/preset-index.json`
 
-Root index of all patterns. The app fetches this file first and compares `dataVersion` to detect changes.
+Root index of all presets, with exactly one entry per preset ID (enforced by `audiflow-editor validate`). The app fetches this file first and compares `dataVersion` to detect changes.
 
 ### Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `dataVersion` | integer | yes | Monotonically increasing. Bumped by CI when any pattern changes. |
+| `dataVersion` | integer | yes | Monotonically increasing. Bumped by CI when any preset changes. |
 | `schemaVersion` | integer | yes | Schema structure version. Bumped when JSON structure changes. |
-| `patterns` | array | yes | Summary entries for all patterns. |
+| `presets` | array | yes | Summary entries for all presets. |
 
 ### PresetIndexEntry
 
-Each element in the `patterns` array:
+Each element in the `presets` array:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | string | yes | Pattern identifier. See [Pattern ID Derivation](#pattern-id-derivation). |
+| `id` | string | yes | Preset identifier. See [Preset ID Derivation](#preset-id-derivation). |
 | `dataVersion` | integer | yes | Mirrors `{id}/meta.json` dataVersion for stale-cache detection. |
 | `displayName` | string | yes | Human-readable podcast name for admin/editor UIs. |
-| `feedUrlHint` | string | yes | Substring of the feed URL for fast pre-filtering. |
-| `playlistCount` | integer | yes | Number of playlist definitions in this pattern. |
+| `feedUrlHints` | string[] | yes | Substrings of the feed URLs for fast pre-filtering, one per feed URL (non-empty, no repeats). A feed matches if it contains any entry. |
+| `playlistCount` | integer | yes | Number of playlist definitions in this preset. |
 
 ### Example
 
 ```json
 {
   "dataVersion": 42,
-  "schemaVersion": 5,
-  "patterns": [
+  "schemaVersion": 8,
+  "presets": [
     {
       "id": "a1b2c3d4e5f6",
       "dataVersion": 7,
       "displayName": "COTEN RADIO",
-      "feedUrlHint": "anchor.fm/s/8c2088c",
+      "feedUrlHints": ["anchor.fm/s/8c2088c"],
       "playlistCount": 3
     }
   ]
@@ -97,11 +97,11 @@ Each element in the `patterns` array:
 
 ---
 
-## Pattern Meta
+## Preset Meta
 
 **File:** `{presetId}/meta.json`
 
-**Schema:** `https://audiflow.app/schema/v6/pattern-meta.json`
+**Schema:** `https://audiflow.app/schema/v8/preset-meta.json`
 
 Per-podcast metadata. The app matches incoming feeds against `podcastGuid` (preferred) or `feedUrls` to find the right config.
 
@@ -109,7 +109,7 @@ Per-podcast metadata. The app matches incoming feeds against `podcastGuid` (pref
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `dataVersion` | integer | yes | -- | Monotonically increasing. Bumped when any file in this pattern changes. |
+| `dataVersion` | integer | yes | -- | Monotonically increasing. Bumped when any file in this preset changes. |
 | `id` | string | yes | -- | Must match the parent directory name. |
 | `podcastGuid` | string | no | -- | Podcast's RSS GUID. Takes priority over feed URL matching. |
 | `feedUrls` | string[] | yes | -- | One or more RSS feed URLs. Supports host-migration scenarios. |
@@ -139,7 +139,7 @@ Per-podcast metadata. The app matches incoming feeds against `podcastGuid` (pref
 
 **File:** `{presetId}/playlists/{playlistId}.json`
 
-**Schema:** `https://audiflow.app/schema/v6/playlist-definition.json`
+**Schema:** `https://audiflow.app/schema/v8/playlist-definition.json`
 
 Defines how a playlist filters, groups, and displays episodes. The field layout follows the data processing pipeline:
 
@@ -161,7 +161,7 @@ episodeFilters   -->  filter episodes before processing
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | string | yes | Unique within the pattern. Must match filename (without `.json`). |
+| `id` | string | yes | Unique within the preset. Must match filename (without `.json`). |
 | `displayName` | string | yes | Name shown to users in the app. |
 | `priority` | integer | no | Default `0`. Lower numbers claim episodes first. Playlists with filters always run before filter-less ones. |
 
@@ -764,19 +764,19 @@ Used in `episodeListing.sort` and per-classifier `episodeListing.sort`.
 
 ---
 
-## Pattern ID Derivation
+## Preset ID Derivation
 
-Pattern IDs are semi-deterministic, computed at creation time:
+Preset IDs are semi-deterministic, computed at creation time:
 
 1. If `podcastGuid` is available: `md5(podcastGuid)[0:12]`
 2. Otherwise: `md5(feedUrls[0])[0:12]`
 
 The ID is a 12-character hex string derived from the MD5 hash. Once created, the ID is stable and used to construct all file paths:
 
-- `{id}/meta.json` -- pattern metadata
+- `{id}/meta.json` -- preset metadata
 - `{id}/playlists/{playlistId}.json` -- playlist definitions
 
 The ID must match across:
 - `presets/meta.json` entry `id`
 - `{id}/meta.json` field `id`
-- The directory name containing the pattern files
+- The directory name containing the preset files

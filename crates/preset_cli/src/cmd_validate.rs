@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use preset_core::models::PresetMeta;
@@ -39,6 +40,7 @@ fn validate_all(patterns_dir: &Path, validator: &Validator) -> anyhow::Result<i3
         Ok(())
     })?;
 
+    error_count += validate_root_index_uniqueness(&patterns_dir.join("meta.json"))?;
     error_count += validate_cross_pattern_uniqueness(patterns_dir)?;
     error_count += validate_preset_id_integrity(patterns_dir)?;
 
@@ -76,11 +78,16 @@ fn validate_files(data_dir: &str, files: &[String], validator: &Validator) -> an
                 error_count += validate_file(p, schema_type, validator)?;
                 Ok(())
             })?;
+            error_count += validate_root_index_uniqueness(&presets_dir.join("meta.json"))?;
             error_count += validate_cross_pattern_uniqueness(&presets_dir)?;
             error_count += validate_preset_id_integrity(&presets_dir)?;
         } else {
             let schema_type = config_walker::detect_schema_type(&path);
+            let is_root_index = matches!(schema_type, SchemaType::PresetIndex);
             error_count += validate_file(&path, schema_type, validator)?;
+            if is_root_index {
+                error_count += validate_root_index_uniqueness(&path)?;
+            }
         }
     }
 
@@ -131,6 +138,47 @@ fn validate_file(
 
     let count = errors.len() as u32;
     Ok(count)
+}
+
+/// Fails when the root index lists a preset more than once. JSON Schema can only
+/// compare whole items, so it cannot catch two entries sharing just an `id`, and
+/// consumers keying on `id` would silently keep one of them.
+/// Returns the number of duplicated IDs.
+fn validate_root_index_uniqueness(root_meta: &Path) -> anyhow::Result<u32> {
+    if !root_meta.exists() {
+        return Ok(0);
+    }
+    let content = std::fs::read_to_string(root_meta)?;
+    let root: serde_json::Value = serde_json::from_str(&content)
+        .map_err(|e| anyhow::anyhow!("Invalid JSON in {}: {e}", root_meta.display()))?;
+
+    let duplicates = find_duplicate_preset_ids(&root);
+    for id in &duplicates {
+        println!(
+            "  FAIL: {} -- preset \"{id}\" is listed more than once",
+            root_meta.display(),
+        );
+    }
+    Ok(duplicates.len() as u32)
+}
+
+/// Returns each `id` appearing more than once in `presets`, in first-repeat order.
+fn find_duplicate_preset_ids(root: &serde_json::Value) -> Vec<String> {
+    let Some(entries) = root.get("presets").and_then(|v| v.as_array()) else {
+        return Vec::new();
+    };
+
+    let mut seen = HashSet::new();
+    let mut duplicates = Vec::new();
+    for id in entries
+        .iter()
+        .filter_map(|e| e.get("id").and_then(|v| v.as_str()))
+    {
+        if !seen.insert(id) && !duplicates.iter().any(|d| d == id) {
+            duplicates.push(id.to_string());
+        }
+    }
+    duplicates
 }
 
 /// Loads every pattern meta.json and checks for cross-pattern uniqueness
@@ -212,4 +260,69 @@ fn load_preset_metas(patterns_dir: &Path) -> anyhow::Result<Vec<PresetMeta>> {
     }
 
     Ok(metas)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn duplicate_ids_are_reported_once_each() {
+        let root = json!({ "presets": [
+            { "id": "a" }, { "id": "b" }, { "id": "a" }, { "id": "a" }, { "id": "c" }, { "id": "c" }
+        ]});
+        assert_eq!(find_duplicate_preset_ids(&root), vec!["a", "c"]);
+    }
+
+    #[test]
+    fn unique_ids_report_nothing() {
+        let root = json!({ "presets": [{ "id": "a" }, { "id": "b" }] });
+        assert!(find_duplicate_preset_ids(&root).is_empty());
+    }
+
+    #[test]
+    fn missing_presets_array_reports_nothing() {
+        assert!(find_duplicate_preset_ids(&json!({})).is_empty());
+    }
+
+    /// A root index that passes the schema, so only the duplicate check can fail it.
+    fn root_with_duplicate_entries() -> serde_json::Value {
+        let summary = json!({
+            "id": "show_a",
+            "dataVersion": 1,
+            "displayName": "Show A",
+            "feedUrlHints": ["https://example.com/rss"],
+            "playlistCount": 1
+        });
+        json!({
+            "dataVersion": 1,
+            "schemaVersion": 8,
+            "presets": [summary, summary]
+        })
+    }
+
+    #[test]
+    fn validate_all_fails_on_duplicate_root_entries() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let root = root_with_duplicate_entries();
+        std::fs::write(tmp.path().join("meta.json"), root.to_string()).unwrap();
+
+        let validator = Validator::from_embedded().unwrap();
+        assert_eq!(validate_all(tmp.path(), &validator).unwrap(), 1);
+    }
+
+    #[test]
+    fn validating_the_root_file_directly_fails_on_duplicate_entries() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let presets = tmp.path().join("presets");
+        std::fs::create_dir_all(&presets).unwrap();
+        let root_path = presets.join("meta.json");
+        let root = root_with_duplicate_entries();
+        std::fs::write(&root_path, root.to_string()).unwrap();
+
+        let validator = Validator::from_embedded().unwrap();
+        let files = [root_path.display().to_string()];
+        assert_eq!(validate_files(".", &files, &validator).unwrap(), 1);
+    }
 }

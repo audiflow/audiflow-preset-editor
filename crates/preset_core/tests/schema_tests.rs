@@ -77,12 +77,55 @@ fn valid_preset_index_passes() {
             "id": "test",
             "dataVersion": 1,
             "displayName": "Test Podcast",
-            "feedUrlHint": "https://example.com",
+            "feedUrlHints": ["https://example.com", "https://old.example.com"],
             "playlistCount": 1
         }]
     });
     let errors = v.validate(SchemaType::PresetIndex, &index);
     assert!(errors.is_empty(), "Expected no errors but got: {errors:?}");
+}
+
+fn index_with_entry(entry: serde_json::Value) -> serde_json::Value {
+    json!({ "dataVersion": 1, "schemaVersion": 8, "presets": [entry] })
+}
+
+#[test]
+fn preset_index_rejects_legacy_scalar_feed_url_hint() {
+    let v = test_validator();
+    let index = index_with_entry(json!({
+        "id": "test",
+        "dataVersion": 1,
+        "displayName": "Test Podcast",
+        "feedUrlHint": "https://example.com",
+        "playlistCount": 1
+    }));
+    assert!(!v.validate(SchemaType::PresetIndex, &index).is_empty());
+}
+
+#[test]
+fn preset_index_rejects_empty_feed_url_hints() {
+    let v = test_validator();
+    let index = index_with_entry(json!({
+        "id": "test",
+        "dataVersion": 1,
+        "displayName": "Test Podcast",
+        "feedUrlHints": [],
+        "playlistCount": 1
+    }));
+    assert!(!v.validate(SchemaType::PresetIndex, &index).is_empty());
+}
+
+#[test]
+fn preset_index_rejects_repeated_feed_url_hints() {
+    let v = test_validator();
+    let index = index_with_entry(json!({
+        "id": "test",
+        "dataVersion": 1,
+        "displayName": "Test Podcast",
+        "feedUrlHints": ["https://example.com", "https://example.com"],
+        "playlistCount": 1
+    }));
+    assert!(!v.validate(SchemaType::PresetIndex, &index).is_empty());
 }
 
 #[test]

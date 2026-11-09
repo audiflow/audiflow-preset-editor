@@ -7,7 +7,12 @@ export const presetSummarySchema = z.object({
   id: z.string(),
   dataVersion: z.number(),
   displayName: z.string(),
-  feedUrlHint: z.string(),
+  feedUrlHints: z
+    .array(z.string().min(1))
+    .min(1)
+    .refine((hints) => new Set(hints).size === hints.length, {
+      message: 'feedUrlHints must not contain repeats',
+    }),
   playlistCount: z.number(),
 });
 

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://audiflow.app/schema/v7/preset-index.json",
+  "$id": "https://audiflow.app/schema/v8/preset-index.json",
   "title": "Preset Index",
-  "description": "Root meta.json at the top level of the config data repository. Lists all available presets with summary information for efficient discovery. The mobile app fetches this file first and uses feedUrlHint for fast pre-filtering before loading individual preset files. Deployed to static hosting (GitHub Pages for production, GCS for dev/staging).",
+  "description": "Root meta.json at the top level of the config data repository. Lists all available presets with summary information for efficient discovery. The mobile app fetches this file first and uses feedUrlHints for fast pre-filtering before loading individual preset files. Deployed to static hosting (GitHub Pages for production, GCS for dev/staging).",
   "type": "object",
   "required": [
     "dataVersion",
@@ -23,7 +23,7 @@
     },
     "presets": {
       "type": "array",
-      "description": "Summary entries for all available presets, used for discovery and pre-filtering. The mobile app iterates this array to find candidates whose feedUrlHint matches the current podcast's feed URL before loading full preset configs.",
+      "description": "Summary entries for all available presets, used for discovery and pre-filtering. Each preset appears exactly once, regardless of how many feed URLs it has; preset ID uniqueness is enforced by the audiflow-editor validate command because JSON Schema cannot express it. The mobile app iterates this array to find candidates with a feedUrlHints entry matching the current podcast's feed URL before loading full preset configs.",
       "items": {
         "$ref": "#/$defs/PresetIndexEntry"
       }
@@ -32,12 +32,12 @@
   "$defs": {
     "PresetIndexEntry": {
       "type": "object",
-      "description": "Summary entry for a single preset in the root index. Contains just enough information for discovery (feedUrlHint) and cache validation (dataVersion) without requiring a fetch of the full preset config.",
+      "description": "Summary entry for a single preset in the root index. Contains just enough information for discovery (feedUrlHints) and cache validation (dataVersion) without requiring a fetch of the full preset config.",
       "required": [
         "id",
         "dataVersion",
         "displayName",
-        "feedUrlHint",
+        "feedUrlHints",
         "playlistCount"
       ],
       "additionalProperties": false,
@@ -56,9 +56,15 @@
           "type": "string",
           "description": "Human-readable podcast name for display in admin and editor interfaces. Not used for matching logic in the mobile app."
         },
-        "feedUrlHint": {
-          "type": "string",
-          "description": "A substring of the podcast's feed URL used for fast pre-filtering at the root index level. The mobile app performs a substring match (feedUrl.contains(feedUrlHint)) to quickly narrow down candidates before loading the full preset config for exact URL or GUID matching. Should be a distinctive portion of the feed URL (e.g., 'anchor.fm/s/8c2088c') that minimizes false positives."
+        "feedUrlHints": {
+          "type": "array",
+          "description": "Substrings of the podcast's feed URLs used for fast pre-filtering at the root index level, with one entry per feed URL so a podcast that moved feeds still matches on either URL. The mobile app treats the preset as a candidate if any entry is a substring of the feed URL (feedUrl.contains(hint)), then loads the full preset config for exact URL or GUID matching. Each entry should be a distinctive portion of a feed URL (e.g., 'anchor.fm/s/8c2088c') that minimizes false positives.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
         },
         "playlistCount": {
           "type": "integer",

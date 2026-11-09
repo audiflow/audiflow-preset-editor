@@ -116,7 +116,7 @@ function PresetList({
   presets: Array<{
     id: string;
     displayName: string;
-    feedUrlHint: string;
+    feedUrlHints: string[];
     playlistCount: number;
   }>;
   navigate: ReturnType<typeof useNavigate>;
@@ -141,7 +141,7 @@ function PresetCard({
   preset: {
     id: string;
     displayName: string;
-    feedUrlHint: string;
+    feedUrlHints: string[];
     playlistCount: number;
   };
   navigate: ReturnType<typeof useNavigate>;
@@ -162,9 +162,9 @@ function PresetCard({
             {t('playlists', { count: preset.playlistCount })}
           </Badge>
         </div>
-        {preset.feedUrlHint && (
-          <CardDescription>{preset.feedUrlHint}</CardDescription>
-        )}
+        {preset.feedUrlHints.map((hint) => (
+          <CardDescription key={hint}>{hint}</CardDescription>
+        ))}
       </CardHeader>
     </Card>
   );
